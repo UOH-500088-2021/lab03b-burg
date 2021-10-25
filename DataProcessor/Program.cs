@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace DataProcessor
@@ -33,13 +34,27 @@ namespace DataProcessor
             using (StreamReader reader = new StreamReader(FileName))
             {
                 var totalCalls = 0;
+                string[] list = { };
+                
                 var line = reader.ReadLine(); // Read the header line, which doesn't contain data
                 while (!reader.EndOfStream)
                 {
                     NumberOfForces++;
                     line = reader.ReadLine();
                     var columns = line.Split(",");  // What if there's a comma inside a data column?
-                    totalCalls += int.Parse(columns[1]);  // What if the data doesn't parse properly?
+                    List<string> sort = new List<string>(columns);
+                    sort.RemoveAt(0);
+                    int length = columns.Length-1;
+                    for(int i=0;i<length;i++)
+                    { 
+                        if(sort[i].Contains("Not available"))
+                        {
+                            sort.RemoveAt(i);
+                            length -= 1;
+                        }
+                    }
+                    sort.Remove("Not available");
+                    totalCalls += int.Parse(sort[1]);  // What if the data doesn't parse properly?
                 }
                 AverageTotalCalls = totalCalls / NumberOfForces;
             }
